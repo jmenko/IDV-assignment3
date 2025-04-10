@@ -1,10 +1,380 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My GitHub Page</title>
+  <meta charset="UTF-8" />
+  <title>Assignment 3 - Exploring Public Transport Ridership Changes</title>
+  <style>
+    /* Global page styling */
+    body {
+      font-family: Helvetica, sans-serif;
+      background-color: #f0f0f0; /* Light grey background */
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background-color: #555; /* Darker grey */
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+    /* Intro box styling (full width below header) */
+    #intro-box {
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 1200px;
+    }
+    /* Main container for two columns */
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      margin: 20px auto;
+      max-width: 1200px;
+    }
+    /* Off-white boxes with a slight shadow for columns */
+    .box {
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin: 10px;
+    }
+    /* Left box: chart container */
+    #chart-box {
+      flex: 1;
+      max-width: 700px;
+    }
+    /* Right box: text content (Key Findings only) */
+    #text-box {
+      flex: 1;
+      max-width: 300px;
+    }
+    /* Chart title above the chart */
+    #chart-title {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    /* Container for data source and legend */
+    #chart-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    /* Data source aligned left */
+    #datasource {
+      text-align: left;
+      font-size: 12px;
+      margin: 0;
+    }
+    /* Legend styling */
+    #legend {
+      font-size: 12px;
+    }
+    /* Text styling for paragraphs */
+    .justified {
+      text-align: justify;
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to my GitHub Page!</h1>
-    <p>This is a simple webpage hosted using GitHub Pages.</p>
+  <header>
+    <h1>Assignment 3 - Exploring Public Transport Ridership Changes</h1>
+  </header>
+  
+  <!-- Intro Box: Hypothesis and Aim -->
+  <div id="intro-box" class="box">
+    <p><strong>Hypothesis</strong>: The addition of a new MRT line correlates with a decline in bus ridership.</p>
+    <h2><u>Aim</u></h2>
+    <p class="justified">
+      Bus and MRT are the two most utilised forms of public transport in Singapore. As MRT lines are often faster, more efficient, and not subject to vehicle traffic, the opening of new MRT lines can often replace certain bus routes that previously served the corridor. With increased MRT connection, speeds and options, it is likely commuters would switch from buses to MRTs when given the option.
+    </p>
+  </div>
+  
+  <!-- Main container for chart and Key Findings -->
+  <main>
+    <!-- Left box: Chart container -->
+    <div id="chart-box" class="box">
+      <div id="chart-title">Yearly Ridership Share of Bus and MRT in Singapore</div>
+      <div id="chart"></div>
+      <!-- Data source and legend container -->
+      <div id="chart-footer">
+        <p id="datasource">
+          Data Source:
+          <a href="https://data.gov.sg/datasets/d_75248cf2fbf340de6a746dc91ec9223c/view" target="_blank">data.gov.sg</a>
+        </p>
+        <!-- Legend with two clear rows -->
+        <div id="legend">
+          <svg width="150" height="60">
+            <!-- Row 1: Bus Share -->
+            <g transform="translate(10,10)">
+              <!-- Black triangle -->
+              <path d="M0,10 L10,0 L20,10 Z" fill="black"></path>
+              <text x="30" y="10" alignment-baseline="middle">Bus Share</text>
+            </g>
+            <!-- Row 2: MRT Share -->
+            <g transform="translate(10,35)">
+              <!-- Black circle -->
+              <circle cx="10" cy="10" r="4" fill="black"></circle>
+              <text x="30" y="10" alignment-baseline="middle">MRT Share</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right box: Key Findings -->
+    <div id="text-box" class="box">
+      <h2><u>Key Findings</u></h2>
+      <p class="justified">
+        <strong>Long-Term Shift in Mode Share:</strong> Clear decline in overall bus ridership share, combined with an increase in MRT ridership share. This overall shift suggests that, in the long run, MRT is capturing a growing proportion of public transport trips at the expense of buses.
+      </p>
+      <p class="justified">
+        <strong>Changes around New MRT Launches:</strong> The new line opening often coincides with an accelerated increase in MRT share, although not drastic.
+      </p>
+      <p class="justified">
+        <strong>Relative Ridership:</strong> Although the bus share is decreasing, there has also been increased overall travel demand so the reality is that bus ridership is still increasing, just at a slower rate to MRT ridership.
+      </p>
+      <p class="justified">
+        <strong>Complementary Roles:</strong> The fact that the decrease in share of Bus ridership following MRT station opening is not drastic may be due to the fact that MRT routes don’t always replace bus routes, but rather bus routes may be reconfigured to serve as feeders to MRT stations.
+      </p>
+    </div>
+  </main>
+  
+  <footer>
+    <p>Julian Menko - 1009439</p>
+    <p>MSc Urban Science, Policy and Planning</p>
+    <p>02.526 - Interactive Data Visualisation</p>
+  </footer>
+  
+  <!-- Include D3.js -->
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script>
+    // Dimensions for the chart
+    const margin = { top: 50, right: 50, bottom: 50, left: 60 },
+          width = 700 - margin.left - margin.right,
+          height = 500 - margin.top - margin.bottom;
+    
+    // Create SVG within the chart div
+    const svg = d3.select("#chart")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    // Tooltip for interactivity
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("position", "absolute")
+      .style("padding", "6px")
+      .style("font", "12px Helvetica, sans-serif")
+      .style("color", "#fff")
+      .style("border-radius", "8px")
+      .style("pointer-events", "none")
+      .style("opacity", 0);
+    
+    // Helper: Convert HEX to RGBA with a specified alpha
+    function toRGBA(hex, alpha) {
+      const h = hex.replace("#", "");
+      const r = parseInt(h.substring(0, 2), 16);
+      const g = parseInt(h.substring(2, 4), 16);
+      const b = parseInt(h.substring(4, 6), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    
+    // Date parser/formatter (assuming years are in YYYY format)
+    const parseDate = d3.timeParse("%Y");
+    const formatYear = d3.timeFormat("%Y");
+    
+    // Load CSV data
+    d3.csv("PublicTransportUtilisationAveragePublicTransportRidership.csv").then(data => {
+      // Group data by year and sum ridership for all modes
+      const grouped = d3.rollup(
+        data,
+        v => {
+          let bus = 0, mrt = 0, total = 0;
+          v.forEach(d => {
+            const ridership = +d.average_ridership;
+            total += ridership;
+            const type = d.type_of_public_transport.toLowerCase();
+            if (type === "bus") bus += ridership;
+            else if (type === "mrt") mrt += ridership;
+          });
+          return { bus, mrt, total };
+        },
+        d => d.year
+      );
+      
+      // Prepare aggregated data with parsed year and share percentages
+      const aggregatedData = Array.from(grouped, ([year, values]) => {
+        const parsedYear = parseDate(year);
+        return {
+          year: parsedYear,
+          busShare: values.total ? (values.bus / values.total) * 100 : 0,
+          mrtShare: values.total ? (values.mrt / values.total) * 100 : 0
+        };
+      });
+      
+      aggregatedData.sort((a, b) => a.year - b.year);
+      
+      // Define scales: xScale is time-based; yScale from 0 to 100%
+      const xScale = d3.scaleTime()
+        .domain(d3.extent(aggregatedData, d => d.year))
+        .range([0, width]);
+      const yScale = d3.scaleLinear()
+        .domain([0, 100])
+        .range([height, 0]);
+      
+      // Axes with labels
+      svg.append("g")
+          .attr("transform", `translate(0,${height})`)
+          .call(d3.axisBottom(xScale).ticks(10))
+          .append("text")
+          .attr("fill", "#000")
+          .attr("y", 40)
+          .attr("x", width / 2)
+          .attr("text-anchor", "middle")
+          .text("Year");
+      
+      svg.append("g")
+          .call(d3.axisLeft(yScale).tickFormat(d3.format(".0f")))
+          .append("text")
+          .attr("fill", "#000")
+          .attr("transform", "rotate(-90)")
+          .attr("y", -50)
+          .attr("x", -height / 2)
+          .attr("dy", "1em")
+          .attr("text-anchor", "middle")
+          .text("Ridership Share (%)");
+      
+      // Line generators for bus and MRT shares (both lines in black)
+      const busLineGenerator = d3.line()
+        .x(d => xScale(d.year))
+        .y(d => yScale(d.busShare));
+      const mrtLineGenerator = d3.line()
+        .x(d => xScale(d.year))
+        .y(d => yScale(d.mrtShare));
+      
+      // Draw bus share line in black
+      svg.append("path")
+        .datum(aggregatedData)
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("d", busLineGenerator);
+      
+      // Draw MRT share line in black
+      svg.append("path")
+        .datum(aggregatedData)
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("d", mrtLineGenerator);
+      
+      // Add interactive symbols for bus share using triangles (black)
+      svg.selectAll(".bus-symbol")
+         .data(aggregatedData)
+         .enter()
+         .append("path")
+         .attr("class", "bus-symbol")
+         .attr("d", d3.symbol().type(d3.symbolTriangle).size(64))
+         .attr("transform", d => `translate(${xScale(d.year)}, ${yScale(d.busShare)})`)
+         .attr("fill", "black")
+         .on("mouseover", (event, d) => {
+            tooltip.transition().duration(200).style("opacity", 0.9);
+            tooltip.html(`<strong>Bus Share</strong><br/>Year: ${formatYear(d.year)}<br/>${d3.format(".1f")(d.busShare)}%`)
+                   .style("left", (event.pageX + 5) + "px")
+                   .style("top", (event.pageY - 28) + "px")
+                   .style("background", "rgba(0,0,0,0.7)");
+         })
+         .on("mouseout", () => {
+            tooltip.transition().duration(500).style("opacity", 0);
+         });
+      
+      // Add interactive symbols for MRT share using circles (black)
+      svg.selectAll(".mrt-symbol")
+         .data(aggregatedData)
+         .enter()
+         .append("circle")
+         .attr("class", "mrt-symbol")
+         .attr("cx", d => xScale(d.year))
+         .attr("cy", d => yScale(d.mrtShare))
+         .attr("r", 4)
+         .attr("fill", "black")
+         .on("mouseover", (event, d) => {
+            tooltip.transition().duration(200).style("opacity", 0.9);
+            tooltip.html(`<strong>MRT Share</strong><br/>Year: ${formatYear(d.year)}<br/>${d3.format(".1f")(d.mrtShare)}%`)
+                   .style("left", (event.pageX + 5) + "px")
+                   .style("top", (event.pageY - 28) + "px")
+                   .style("background", "rgba(0,0,0,0.7)");
+         })
+         .on("mouseout", () => {
+            tooltip.transition().duration(500).style("opacity", 0);
+         });
+      
+      // Define vertical reference lines for MRT opening events
+      const mrtOpenings = [
+        { line: "North-East Line", date: "2003", color: "#B3007C" },
+        { line: "Circle Line", date: "2009", color: "#F7A600" },
+        { line: "Downtown Line", date: "2013", color: "#0099CC" }
+      ];
+      
+      mrtOpenings.forEach(mrt => {
+        const dateObj = parseDate(mrt.date);
+        
+        // Draw vertical line for MRT opening (without tooltip events)
+        svg.append("line")
+           .attr("class", "vertical-line")
+           .attr("x1", xScale(dateObj))
+           .attr("x2", xScale(dateObj))
+           .attr("y1", 0)
+           .attr("y2", height)
+           .attr("stroke", mrt.color)
+           .attr("stroke-dasharray", "4")
+           .attr("stroke-width", 2);
+        
+        // Find matching data for this MRT opening year
+        const match = aggregatedData.find(d => d.year.getFullYear() === dateObj.getFullYear());
+        if (match) {
+          // Add an interactive circle at the intersection of the vertical line and the MRT share line
+          svg.append("circle")
+             .attr("cx", xScale(match.year))
+             .attr("cy", yScale(match.mrtShare))
+             .attr("r", 5)
+             .attr("fill", "black")
+             .on("mouseover", (event) => {
+               tooltip.transition().duration(200).style("opacity", 0.9);
+               tooltip.html(`<strong>${mrt.line}</strong><br/>Opened: ${mrt.date}<br/>MRT Share = ${d3.format(".1f")(match.mrtShare)}%`)
+                      .style("left", (event.pageX + 5) + "px")
+                      .style("top", (event.pageY - 28) + "px")
+                      .style("background", toRGBA(mrt.color, 0.7));
+             })
+             .on("mouseout", () => {
+               tooltip.transition().duration(500).style("opacity", 0);
+             });
+          
+          // Add an interactive circle at the intersection of the vertical line and the Bus share line
+          svg.append("circle")
+             .attr("cx", xScale(match.year))
+             .attr("cy", yScale(match.busShare))
+             .attr("r", 5)
+             .attr("fill", "black")
+             .on("mouseover", (event) => {
+               tooltip.transition().duration(200).style("opacity", 0.9);
+               tooltip.html(`<strong>${mrt.line}</strong><br/>Opened: ${mrt.date}<br/>Bus Share = ${d3.format(".1f")(match.busShare)}%`)
+                      .style("left", (event.pageX + 5) + "px")
+                      .style("top", (event.pageY - 28) + "px")
+                      .style("background", toRGBA(mrt.color, 0.7));
+             })
+             .on("mouseout", () => {
+               tooltip.transition().duration(500).style("opacity", 0);
+             });
+        }
+      });
+    });
+  </script>
 </body>
 </html>
